@@ -78,20 +78,23 @@ function(Code128Reader,
         }
     }
 
-    function initInputStream(cb) {
-        var video;
+    function initInputStream(cb, video) {
         if (_config.inputStream.type == "VideoStream") {
-            video = document.createElement("video");
+            if (!video) {
+              video = document.createElement("video");
+            }
             _inputStream = InputStream.createVideoStream(video);
         } else if (_config.inputStream.type == "ImageStream") {
             _inputStream = InputStream.createImageStream();
         } else if (_config.inputStream.type == "LiveStream") {
-            var $viewport = document.querySelector("#interactive.viewport");
-            if ($viewport) {
-                video = $viewport.querySelector("video");
-                if (!video) {
-                    video = document.createElement("video");
-                    $viewport.appendChild(video);
+            if (!video) {
+                var $viewport = document.querySelector("#interactive.viewport");
+                if ($viewport) {
+                    video = $viewport.querySelector("video");
+                    if (!video) {
+                        video = document.createElement("video");
+                        $viewport.appendChild(video);
+                    }
                 }
             }
             _inputStream = InputStream.createLiveStream(video);
@@ -434,6 +437,10 @@ function(Code128Reader,
             } else {
                 initInputStream(cb);
             }
+        },
+        initWithVideo : function(config, cb, video) {
+          _config = HtmlUtils.mergeObjects(_config, config);
+          initInputStream(cb, video);
         },
         start : function() {
             start();
